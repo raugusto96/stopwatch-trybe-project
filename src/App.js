@@ -1,12 +1,24 @@
+import React from 'react';
 import './App.css';
-import StopWatch from './components/stopwatch/Index';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import About from './components/About'
+import Home from './components/Menu'
+import Preferences from './components/Preferences'
 
-function App() {
-  return (
-    <div className="App">
-      <StopWatch />
-    </div>
-  );
+class App extends React.Component {
+  render () {
+    return (
+      <div id="App">
+        <BrowserRouter>
+          <Switch>
+            <Route path="/about" component={ About } />
+            <Route path="/settings" component={ Preferences } />
+            <Route path="/" component={ Home }  />
+          </Switch>
+        </BrowserRouter>
+      </div>
+    );
+  }
 }
 
 export default App;
