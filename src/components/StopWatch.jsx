@@ -1,7 +1,6 @@
 import React from 'react';
 import '../css/stopwatch.css'
 import * as timeFunctions from '../functions/time';
-import { Link } from 'react-router-dom';
 
 import {
   MdAlarmOff,
@@ -26,6 +25,7 @@ export default class StopWatch extends React.Component {
       startCountdownDisabled: true,
       showTimer: false,
       countdownEnd: false,
+      countdownCanceled: false,
     }
 
     this.state = this.initialState;
@@ -39,6 +39,7 @@ export default class StopWatch extends React.Component {
       if (this.state.time > 0) this.startCountdown();
       else if (!this.state.countdownCanceled) {
         this.setState({ showTimer: false, countdownEnd: true });
+        new Audio('notification.wav').play();
       }
     }
   }
@@ -96,7 +97,7 @@ export default class StopWatch extends React.Component {
   }
 
   goBack = () => {
-    this.setState({ showTimer: false, countdownEnd: true });
+    this.setState({ showTimer: false, countdownEnd: false });
   }
 
   setFastTimer = () => {
@@ -122,14 +123,19 @@ export default class StopWatch extends React.Component {
     const max = 60;
     const timeInMinutes = Math.floor(Math.random() * (max - min + 1) + min);
     const timeInSeconds = Math.floor(Math.random() * (max - min + 1) + min);
-    console.log(timeInMinutes, timeInSeconds);
-    this.setState({
-      temporaryTime: `${timeInMinutes}m ${timeInSeconds}s`,
-    })
+    if (timeInMinutes === 60) {
+      this.setState({
+        temporaryTime: `${timeInMinutes}m`  
+      })
+    } else {
+      this.setState({
+        temporaryTime: `${timeInMinutes}m ${timeInSeconds}s`,
+      })
+    }
   }
 
   render() {
-    const { startCountdownDisabled, minutes, seconds, showTimer, temporaryTime } = this.state;
+    const { startCountdownDisabled, minutes, seconds, showTimer, temporaryTime, countdownCanceled, countdownEnd } = this.state;
     const [minutesLeft, minutesRight] = String(minutes).padStart(2, '0');
     const [secondsLeft, secondsRight] = String(seconds).padStart(2, '0');
     return(
@@ -211,7 +217,13 @@ export default class StopWatch extends React.Component {
               </form>
             </>
           )
-        };
+        }
+        { (countdownEnd && !countdownCanceled) && (
+          <div className="countdownEndMessage">
+            <strong><div className="tada">🥳</div>Tempo Finalizado!</strong>
+            <button onClick={ this.goBack }>Voltar</button>
+          </div>
+        )}
     </div>
     )
   }
